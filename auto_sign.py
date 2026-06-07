@@ -49,12 +49,10 @@ def sign(session, cookie_str):
     if any(kw in resp2.text for kw in ("签到成功", "恭喜你签到成功")):
         print("✅ 签到成功！")
     else:
-        # 尝试输出错误信息
         msg = re.search(r'<div class="c">(.*?)</div>', resp2.text, re.DOTALL)
-        if msg:
-            print(f"⚠️ 签到结果：{msg.group(1).strip()}")
-        else:
-            print("⚠️ 签到失败，请检查 Cookie 是否有效")
+        err_msg = msg.group(1).strip() if msg else "未知错误"
+        print(f"❌ 签到失败：{err_msg}", file=sys.stderr)
+        sys.exit(1)
 
 def apply_task(session, cookie_str):
     print("📌 开始处理红包任务...")
@@ -82,7 +80,10 @@ def apply_task(session, cookie_str):
     if any(kw in resp2.text for kw in ("任务申请成功", "恭喜您，任务已成功完成")):
         print("🎉 红包任务领取成功！")
     else:
-        print("⚠️ 任务领取失败，请检查页面返回")
+        msg = re.search(r'<div class="c">(.*?)</div>', resp2.text, re.DOTALL)
+        err_msg = msg.group(1).strip() if msg else "未知错误"
+        print(f"❌ 任务领取失败：{err_msg}", file=sys.stderr)
+        sys.exit(1)
 
 def main():
     cookie_str = get_cookie()
@@ -90,12 +91,14 @@ def main():
         try:
             sign(session, cookie_str)
         except Exception as e:
-            print(f"❌ 签到异常：{e}")
+            print(f"❌ 签到异常：{e}", file=sys.stderr)
+            sys.exit(1)
 
         try:
             apply_task(session, cookie_str)
         except Exception as e:
-            print(f"❌ 任务异常：{e}")
+            print(f"❌ 任务异常：{e}", file=sys.stderr)
+            sys.exit(1)
 
 if __name__ == "__main__":
     main()
