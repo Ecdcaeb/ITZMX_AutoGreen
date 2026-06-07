@@ -65,7 +65,7 @@ def sign(session, cookie_str, name):
         "formhash": formhash,
         "qdxq": "kx",
         "qdmode": "1",
-        "todaysay": "签到",
+        "todaysay": "I Love AutoGreen",
     }
     resp2 = session.post(post_url, data=data,
                          headers={**HEADERS, "Cookie": cookie_str, "Referer": url})
